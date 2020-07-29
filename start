@@ -1,0 +1,25 @@
+#!/bin/bash
+
+realpath() {
+  [[ $1 = /* ]] && echo "$1" || echo "$PWD/${1#./}"
+}
+
+PROXY_PORT=8888
+OVPN_CONFIG=$(realpath "$1")
+
+echo -n Enter VPN password:
+read -s OVPN_PASSWD
+echo
+
+docker run \
+  --volume "$OVPN_CONFIG:/etc/openvpn/config:ro" \
+  --volume "$(pwd)/tinyproxy.conf:/etc/tinyproxy.conf:ro" \
+  --volume "$(pwd)/entrypoint.sh:/entrypoint.sh:ro" \
+  --device /dev/net/tun \
+  --cap-add NET_ADMIN \
+  --publish $PROXY_PORT:8888 \
+  --rm \
+  --tty \
+  --detach \
+  openvpn-tinyproxy \
+  $OVPN_PASSWD
