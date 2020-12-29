@@ -1,6 +1,8 @@
 #!/bin/sh
 
-echo "$1">/etc/openvpn/passwd
+if [ ! -f /etc/openvpn/passwd ]; then
+  echo "$1">/etc/openvpn/passwd
+fi
 
 /usr/sbin/openvpn \
   --config /etc/openvpn/config \

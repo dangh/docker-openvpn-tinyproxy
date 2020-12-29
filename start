@@ -8,13 +8,22 @@ realpath() {
 
 PROXY_PORT=8888
 OVPN_CONFIG=$(realpath "$1")
+OVPN_PASSWD=$(realpath "$1").passwd
 
-echo -n Enter VPN password:
-read -s OVPN_PASSWD
-echo
+container_name=$( docker ps --filter ancestor=openvpn-tinyproxy --format '{{.Names}}' )
+if [ -n "$container_name" ]; then
+  docker kill $container_name
+fi
+
+if [ ! -f "$OVPN_PASSWD" ]; then
+  echo -n Enter VPN password:
+  read -s OVPN_PASSWD
+  echo
+fi
 
 docker run \
   --volume "$OVPN_CONFIG:/etc/openvpn/config:ro" \
+  --volume "$OVPN_PASSWD:/etc/openvpn/passwd:ro" \
   --volume "$DIR/tinyproxy.conf:/etc/tinyproxy.conf:ro" \
   --volume "$DIR/entrypoint.sh:/entrypoint.sh:ro" \
   --device /dev/net/tun \
