@@ -1,3 +1,3 @@
 FROM alpine
-RUN apk add --update-cache openvpn tinyproxy
+RUN apk add --no-cache openvpn tinyproxy
 ENTRYPOINT ["/entrypoint.sh"]
