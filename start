@@ -7,30 +7,40 @@ realpath() {
 }
 
 PROXY_PORT=8888
-OVPN_CONFIG=$(realpath "$1")
-OVPN_PASSWD=$(realpath "$1").passwd
+OVPN_CONFIG_FILE=$(realpath "$1")
+OVPN_PASSWD_FILE=$(realpath "$1").passwd
 
 container_name=$( docker ps --filter ancestor=openvpn-tinyproxy --format '{{.Names}}' )
-if [ -n "$container_name" ]; then
+if [[ -n "$container_name" ]]; then
   docker kill $container_name
 fi
 
-if [ ! -f "$OVPN_PASSWD" ]; then
+args=
+args+=" --volume $OVPN_CONFIG_FILE:/etc/openvpn/config:ro"
+if [[ -f "$OVPN_PASSWD_FILE" ]]; then
+  args+=" --volume $OVPN_PASSWD_FILE:/etc/openvpn/passwd:ro"
+else
   echo -n Enter VPN password:
   read -s OVPN_PASSWD
   echo
+  args+=" --env OVPN_PASSWD=$OVPN_PASSWD"
 fi
+args+=" --volume $DIR/entrypoint.sh:/entrypoint.sh"
+args+=" --volume $DIR/etc/tinyproxy/tinyproxy.conf:/etc/tinyproxy/tinyproxy.conf"
+args+=" --volume $DIR/etc/hosts.slow:/etc/hosts.slow"
+args+=" --volume $DIR/etc/hosts.resolved:/etc/hosts.resolved"
+args+=" --device /dev/net/tun"
+args+=" --cap-add NET_ADMIN"
+args+=" --publish $PROXY_PORT:8888"
+args+=" --rm"
+args+=" --tty"
+args+=" --detach"
+for flag in "$@"; do
+  case "$flag" in
+    -r)
+      args+=" --env RESOLVE_HOSTS=1"
+      ;;
+  esac
+done
 
-docker run \
-  --volume "$OVPN_CONFIG:/etc/openvpn/config:ro" \
-  --volume "$OVPN_PASSWD:/etc/openvpn/passwd:ro" \
-  --volume "$DIR/tinyproxy.conf:/etc/tinyproxy.conf:ro" \
-  --volume "$DIR/entrypoint.sh:/entrypoint.sh:ro" \
-  --device /dev/net/tun \
-  --cap-add NET_ADMIN \
-  --publish $PROXY_PORT:8888 \
-  --rm \
-  --tty \
-  --detach \
-  openvpn-tinyproxy \
-  $OVPN_PASSWD
+docker run $args openvpn-tinyproxy

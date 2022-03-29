@@ -1,3 +1,3 @@
 FROM alpine
-RUN apk add --no-cache openvpn tinyproxy
+RUN apk add --update --no-cache openvpn tinyproxy nmap
 ENTRYPOINT ["/entrypoint.sh"]
