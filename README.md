@@ -23,4 +23,4 @@ $ ./start profile.ovpn
 
 ### Troubleshooting
 
-If you notice some hosts has slow connection (for example: `ssm.ap-southeast-1.amazonaws.com`), add the domain to *etc/hosts.slow* and start container with `-r` flag
+If you notice some hosts has slow connection (for example: `ssm.ap-southeast-1.amazonaws.com`), add the domain to *etc/hosts.slow*

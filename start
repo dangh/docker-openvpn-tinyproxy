@@ -35,12 +35,5 @@ args+=" --publish $PROXY_PORT:8888"
 args+=" --rm"
 args+=" --tty"
 args+=" --detach"
-for flag in "$@"; do
-  case "$flag" in
-    -r)
-      args+=" --env RESOLVE_HOSTS=1"
-      ;;
-  esac
-done
 
 docker run $args openvpn-tinyproxy
