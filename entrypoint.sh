@@ -1,14 +1,10 @@
 #!/bin/sh
 
-if [[ ! -f /etc/openvpn/passwd ]]; then
-  echo "$OVPN_PASSWD">/etc/openvpn/passwd
-fi
-
 : > /var/log/openvpn
 
 /usr/sbin/openvpn \
-  --config /etc/openvpn/config \
-  --askpass /etc/openvpn/passwd \
+  --config /etc/openvpn/profile/config \
+  --askpass /etc/openvpn/profile/passwd \
   --auth-nocache \
   --daemon \
   --log /dev/stdout \
@@ -20,9 +16,9 @@ fi
 # wait till openvpn connected
 grep -q 'Initialization Sequence Completed' <( tail -f /var/log/openvpn )
 
-: > /etc/hosts.resolved
+: > /etc/openvpn/hosts/resolved
 
-cat /etc/hosts.slow | while read domain; do
+cat /etc/openvpn/hosts/resolve | while read domain; do
   if [[ "$domain" = "#"* ]]; then
     continue
   fi
@@ -42,12 +38,12 @@ cat /etc/hosts.slow | while read domain; do
   fi
   if [[ -n "$fastest_ip" ]]; then
     echo Found best IP for domain $domain: $fastest_ip
-    echo $fastest_ip $domain >> /etc/hosts.resolved
+    echo $fastest_ip $domain >> /etc/openvpn/hosts/resolved
   fi
 done
 
 # append resolved domains
-cat /etc/hosts.resolved >> /etc/hosts
+cat /etc/openvpn/hosts/resolved >> /etc/hosts
 
 /usr/bin/tinyproxy -d &
 
