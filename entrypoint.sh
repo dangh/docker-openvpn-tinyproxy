@@ -11,6 +11,7 @@
   --script-security 2 \
   --up /etc/openvpn/up.sh \
   --down /etc/openvpn/down.sh \
+  --fast-io \
   | tee /var/log/openvpn &
 
 # wait till openvpn connected
