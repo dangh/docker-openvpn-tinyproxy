@@ -3,7 +3,7 @@
 ### Usage
 
 ```sh
-docker pull dangh/openvpn-tinyproxy
+docker pull huynhminhdang/openvpn-tinyproxy
 docker run \
   --volume <openvpn-profile-dir>:/etc/openvpn/profile \
   --volume <openvpn-hosts-dir>:/etc/openvpn/hosts \
@@ -13,7 +13,7 @@ docker run \
   --rm \
   --tty \
   --detach \
-  openvpn-tinyproxy
+  huynhminhdang/openvpn-tinyproxy
 ```
 
 #### Mount points and files
