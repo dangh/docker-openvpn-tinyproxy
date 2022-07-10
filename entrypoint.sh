@@ -46,6 +46,4 @@ done
 # append resolved domains
 cat /etc/openvpn/hosts/resolved >> /etc/hosts
 
-/usr/bin/tinyproxy -d &
-
-sh
+/usr/bin/tinyproxy -d
